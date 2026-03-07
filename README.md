@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains the dataset annotations for our sensational image detection dataset, called Sens-VisualNews. In this repository, we only release the annotation files. Please download the source images from the VisualNews repository, as explained in the Instructions section below.
+This repository contains the dataset annotations and evaluation code for our sensational image detection dataset, called Sens-VisualNews. In this repository, we release the JSON dataset annotation files. The source images can be retrieved from the official VisualNews repository, as explained in the sections below.
 
 ## Paper Abstract
 
@@ -28,6 +28,25 @@ Each sample contains the following fields:
     "gt": true if the image is sensational, otherwise false
 }
 ```
+
+## Evaluation
+
+Requirements:
+- PyTorch (torch)
+- FlashAttention2 (flash-attn)
+- transformers
+- sklearn
+- peft
+
+Run the following command to evaluate the (fine-tuned) Qwen3-VL 2B model on the Sens-VisualNews dataset:
+```
+python evaluate.py \
+    --dataset full_test.json \
+    --model_id Qwen/Qwen3-VL-2B-Instruct \
+    --peft_ckp PATH_TO_PEFT_ADAPTER
+```
+
+The base model (without a PEFT adapter) can be evaluted by omitting the `--peft_ckp` argument. Note that, depending on the model and fine-tuning setup, the optimal model prompt may differ. A custom prompt can be specified via the `--prompt` argument. Please consult our paper for more details on the experimental setup.
 
 ## Citation
 
