@@ -1,6 +1,6 @@
 import torch
 from transformers import (
-    Qwen3VLForConditionalGeneration,
+    AutoModelForImageTextToText,
     AutoProcessor,
 )
 from peft import PeftModel
@@ -9,6 +9,7 @@ import argparse
 import random
 import json
 from tqdm import tqdm
+import os
 
 DEFAULT_PROMPT = "Is this image sensational? A sensational image evokes strong emotions (e.g. fear, anger, anxiety, disgust, shock). Answer with a single yes or no."
 
@@ -21,20 +22,22 @@ def parse_response(resp):
         print("invalid llm response!")
         return random.random() < 0.5
 
-def evaluate_row(model, processor, prompt, image):
+def evaluate_row(model, processor, prompt, format, image):
+    if format == "pre":
+        content = [
+            {"type": "image", "image": image},
+            {"type": "text", "text": prompt}
+        ]
+    else:
+        content = [
+            {"type": "text", "text": prompt},
+            {"type": "image", "image": image}
+        ]
+        
     msgs = [
         {
             "role": "user",
-            "content": [
-                {
-                    "type": "image",
-                    "image": image,
-                },
-                {
-                    "type": "text",
-                    "text": prompt,
-                },
-            ],
+            "content": content,
         }
     ]
 
@@ -58,16 +61,20 @@ def evaluate_row(model, processor, prompt, image):
     return parse_response(text)
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--data_dir", type=str, required=True)
 parser.add_argument("--dataset", type=str, default="full_test.json")
 parser.add_argument("--peft_ckp", type=str)
 parser.add_argument("--model_id", type=str, required=True)
 parser.add_argument("--prompt", type=str)
+parser.add_argument("--format", type=str, choices=["pre", "post"], default="pre")
+parser.add_argument("--trust_remote_code", action="store_true")
 args = parser.parse_args()
 
-model = Qwen3VLForConditionalGeneration.from_pretrained(
+model = AutoModelForImageTextToText.from_pretrained(
     args.model_id,
     dtype=torch.bfloat16,
     attn_implementation="flash_attention_2",
+    trust_remote_code=args.trust_remote_code
 )
 
 if args.peft_ckp is not None:
@@ -89,9 +96,9 @@ y_true = []
 y_pred = []
 for ex in tqdm(dataset):
     gt = ex["gt"]
-    image = ex["image"]
+    image = os.path.join(args.data_dir, ex["image"])
 
-    pred = evaluate_row(model, processor, prompt, image)
+    pred = evaluate_row(model, processor, prompt, args.format, image)
 
     y_true.append(gt)
     y_pred.append(pred)

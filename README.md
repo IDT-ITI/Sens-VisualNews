@@ -38,15 +38,17 @@ Requirements:
 - sklearn
 - peft
 
-Run the following command to evaluate the (fine-tuned) Qwen3-VL 2B model on the Sens-VisualNews dataset:
+The following script can be used to evaluate a Multimodal LLM on the Sens-VisualNews dataset. For example, to reproduce the evaluation results for Qwen3-VL 2B, run the following command:
 ```
 python evaluate.py \
+    --data_dir PATH_TO_VISUAL_NEWS \
     --dataset full_test.json \
     --model_id Qwen/Qwen3-VL-2B-Instruct \
-    --peft_ckp PATH_TO_PEFT_ADAPTER
+    --format pre \
+    --prompt "Does this image trigger strong emotional responses (e.g. fear, anger, anxiety, disgust, shock)? Answer with a single yes or no."
 ```
 
-The base model (without a PEFT adapter) can be evaluted by omitting the `--peft_ckp` argument. Note that, depending on the model and fine-tuning setup, the optimal model prompt may differ. A custom prompt can be specified via the `--prompt` argument. Please consult our paper for more details on the experimental setup.
+Fine-tuned models with PEFT can be evaluted by specifying the `--peft_ckp` argument. Note that, depending on the model and fine-tuning setup, the optimal model prompt may differ. A custom prompt can be specified via the `--prompt` argument. `--format` controls whether the visual tokens are appended or pre-prended in the prompt (either "pre" or "post"). Please consult our paper for more details on the experimental setup.
 
 ## Citation
 
@@ -57,6 +59,12 @@ TODO
 ```
 
 ## License
+
+This code is provided for academic, non-commercial use only. Please also check for any restrictions applied in the code parts and datasets used here from other sources. For the materials not covered by any such restrictions, redistribution and use in source and binary forms, with or without modification, are permitted for academic non-commercial use provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation provided with the distribution.
+
+This software is provided by the authors "as is" and any express or implied warranties, including, but not limited to, the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the authors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
 
 ## Acknowledgement
 
