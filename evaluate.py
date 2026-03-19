@@ -6,24 +6,28 @@ from transformers import (
 from peft import PeftModel
 from sklearn.metrics import accuracy_score
 import argparse
-import random
 import json
 from tqdm import tqdm
 import os
+import re
 
 DEFAULT_PROMPT = "Is this image sensational? A sensational image evokes strong emotions (e.g. fear, anger, anxiety, disgust, shock). Answer with a single yes or no."
 
 def parse_response(resp):
-    if "yes" in resp.lower():
-        return True
-    elif "no" in resp.lower():
-        return False
-    else:
-        print("invalid llm response!")
-        return random.random() < 0.5
+    resp = resp.lower()
+    has_yes = bool(re.search(r"\b(yes)\b", resp))
+    has_no = bool(re.search(r"\b(no)\b", resp))
 
-def evaluate_row(model, processor, prompt, format, image):
-    if format == "pre":
+    if has_yes and not has_no:
+        return True
+    elif has_no and not has_yes:
+        return False
+    
+    print("invalid llm response: {}".format(resp.strip()))
+    return None
+
+def evaluate_row(model, processor, prompt, pformat, image):
+    if pformat == "pre":
         content = [
             {"type": "image", "image": image},
             {"type": "text", "text": prompt}
@@ -81,6 +85,7 @@ if args.peft_ckp is not None:
     model = PeftModel.from_pretrained(model, args.peft_ckp)
     print("peft enabled")
 
+model.eval()
 model.cuda()
 
 processor = AutoProcessor.from_pretrained(args.model_id)
@@ -102,6 +107,9 @@ for ex in tqdm(dataset):
 
     y_true.append(gt)
     y_pred.append(pred)
+
+print("Num Invalid = {}".format(len([x for x in y_pred if x is None])))
+y_pred = [x if x is not None else False for x in y_pred]
 
 top1 = 100 * accuracy_score(y_true=y_true, y_pred=y_pred)
 print("Accuracy = {}".format(round(top1, 1)))
