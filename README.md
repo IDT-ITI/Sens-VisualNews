@@ -29,26 +29,57 @@ Each sample contains the following fields:
 }
 ```
 
-## Evaluation
+## Requirements
 
-Requirements:
 - PyTorch (torch)
 - FlashAttention2 (flash-attn)
 - transformers
 - sklearn
 - peft
 
+## Evaluation
+
 The following script can be used to evaluate a Multimodal LLM on the Sens-VisualNews dataset. For example, to reproduce the evaluation results for Qwen3-VL 2B, run the following command:
 ```
 python evaluate.py \
     --data_dir PATH_TO_VISUAL_NEWS \
-    --dataset full_test.json \
+    --dataset dataset/full_test.json \
     --model_id Qwen/Qwen3-VL-2B-Instruct \
     --format pre \
     --prompt "Does this image trigger strong emotional responses (e.g. fear, anger, anxiety, disgust, shock)? Answer with a single yes or no."
 ```
 
 Fine-tuned models with PEFT can be evaluted by specifying the `--peft_ckp` argument. Note that, depending on the model and fine-tuning setup, the optimal model prompt may differ. A custom prompt can be specified via the `--prompt` argument. `--format` controls whether the visual tokens are appended or pre-prended in the prompt (either "pre" or "post"). Please consult our paper for more details on the experimental setup.
+
+## Fine-tuning with LoRA
+
+Run the following command to fine-tune Qwen3-VL 2B on the Sens-VisualNews development set using LoRA:
+```
+torchrun sft.py \
+    --data_dir PATH_TO_VISUAL_NEWS \
+    --train_dataset dataset/full_dev.json \
+    --pretrained Qwen/Qwen3-VL-2B-Instruct \
+    --per_device_train_batch_size 1 \
+    --gradient_accumulation_steps 64 \
+    --num_train_epochs 30 \
+    --gradient_checkpointing true \
+    --learning_rate 5e-4 \
+    --lr_scheduler_type cosine \
+    --warmup_steps 0.1 \
+    --logging_steps 1 \
+    --bf16 \
+    --remove_unused_columns false \
+    --dataloader_num_workers 4
+```
+
+To evaluate the final PEFT checkpoint, run the following command:
+```
+python evaluate.py \
+    --data_dir PATH_TO_VISUAL_NEWS \
+    --dataset dataset/full_test.json \
+    --model_id Qwen/Qwen3-VL-2B-Instruct \
+    --peft_ckp trainer_output/checkpoint-450
+```
 
 ## Citation
 

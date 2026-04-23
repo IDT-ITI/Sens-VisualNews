@@ -1,3 +1,5 @@
+# Andreas Goulas <agoulas@iti.gr>
+
 import torch
 from transformers import (
     AutoModelForImageTextToText,
