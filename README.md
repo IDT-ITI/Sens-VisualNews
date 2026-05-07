@@ -83,11 +83,21 @@ python evaluate.py \
 
 ## Citation
 
-If you find our work useful, please cite:
+If you find our work or code useful, please cite our publication:
+
+A. Goulas, D. Galanopoulos, E. Apostolidis, V. Mezaris, "Sens-VisualNews: A Benchmark Dataset for Sensational Image Detection", IEEE Int. Conf. on Image Processing (ICIP 2026), Tampere, Finland, Sept. 2026.
 
 ```
-TODO
+@inproceedings{goulas2026SensVisualNews,
+  title={Sens-VisualNews: A Benchmark Dataset for Sensational Image Detection},
+  author={Goulas, Andreas and Galanopoulos, Damianos and Apostolidis, Evlampios and Mezaris, Vasileios},
+  booktitle={IEEE Int. Conf. on Image Processing (ICIP 2026)},
+  year={2026},
+  organization={IEEE}
+}
 ```
+
+Link to preprint: coming soon
 
 ## License
 
