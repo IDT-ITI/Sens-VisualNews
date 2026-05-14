@@ -97,7 +97,7 @@ A. Goulas, D. Galanopoulos, E. Apostolidis, V. Mezaris, "Sens-VisualNews: A Benc
 }
 ```
 
-Link to preprint: coming soon
+Link to preprint: [http://arxiv.org/abs/2605.10394](http://arxiv.org/abs/2605.10394)
 
 ## License
 
