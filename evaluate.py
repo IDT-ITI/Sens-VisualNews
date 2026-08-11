@@ -111,7 +111,7 @@ for ex in tqdm(dataset):
     y_pred.append(pred)
 
 print("Num Invalid = {}".format(len([x for x in y_pred if x is None])))
-y_pred = [x if x is not None else False for x in y_pred]
+assert all(x is not None for x in y_pred)
 
 top1 = 100 * accuracy_score(y_true=y_true, y_pred=y_pred)
 print("Accuracy = {}".format(round(top1, 1)))
